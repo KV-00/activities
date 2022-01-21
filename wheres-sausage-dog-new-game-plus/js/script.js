@@ -46,4 +46,8 @@ function draw() {
 
 function mousePressed() {
   sausageDog.mousePressed();
+
+  for (let i = 0; i < animals.length; i++) {
+    animals[i].mousePressed();
+  }
 }

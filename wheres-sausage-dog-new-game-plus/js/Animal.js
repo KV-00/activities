@@ -31,4 +31,10 @@ class Animal {
         return false;
     }
   }
+
+  mousePressed() {
+    if (this.overlap(mouseX, mouseY)) {
+      this.x += 10;
+    }
+  }
 }
