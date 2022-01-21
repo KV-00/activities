@@ -3,21 +3,53 @@ class Animal {
     this.x = x;
     this.y = y;
     this.image = image;
+    this.touch = false;
+    this.vx = random(-1,1);
+    this.vy = random(-1,1);
+
+    this.r = 25;
 
     this.angle = 0;
+
+    this.jitter = 0.0;
   }
 
   update() {
     this.display();
+
+    this.angle = atan(this.vy / this.vx);
+    this.angle = this.angle + this.jitter;
+
+    if (second() % 1 === 0) {
+        this.jitter = random(-0.05, 0.05);
+      }
+
+    if (this.touch) {
+      this.x += this.vx*5;
+      this.y += this.vy*5;
+      this.jitter = random(-0.1, 0.1);
+    }
   }
 
   display() {
     push();
     imageMode(CENTER);
     translate(this.x, this.y);
+
     rotate(this.angle);
     image(this.image, 0, 0);
+
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x > width - this.r || this.x < this.r) {
+      this.vx = -this.vx;
+    }
+    if (this.y > height - this.r || this.y < this.r) {
+      this.vy = -this.vy;
+    }
+
     pop();
+
   }
 
   overlap(x, y) {
@@ -34,7 +66,7 @@ class Animal {
 
   mousePressed() {
     if (this.overlap(mouseX, mouseY)) {
-      this.x += 10;
+      this.touch = true;
     }
   }
 }

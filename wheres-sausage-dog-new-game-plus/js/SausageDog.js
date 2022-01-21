@@ -6,8 +6,8 @@ class SausageDog extends Animal {
     this.found = false;
     this.rotationSpeed = 0.05;
     this.growth = 5;
-    this.rotationAcceleration = 0.005;
-    this.growthAcceleration = 2;
+    this.rotationAcceleration = 0.1;
+    this.growthAcceleration = 5;
   }
 
   update() {
