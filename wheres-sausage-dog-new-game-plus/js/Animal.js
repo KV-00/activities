@@ -4,8 +4,9 @@ class Animal {
     this.y = y;
     this.image = image;
     this.touch = false;
-    this.vx = random(-1,1);
-    this.vy = random(-1,1);
+    this.vx = random(1,-1);
+    this.vy = random(1,-1);
+    this.acceleration = 0.01;
 
     this.r = 25;
 
@@ -26,7 +27,9 @@ class Animal {
 
     if (this.touch) {
       this.x += this.vx*5;
+      this.vx += this.acceleration;
       this.y += this.vy*5;
+      this.vy += this.acceleration;
       this.jitter = random(-0.1, 0.1);
     }
   }
@@ -41,13 +44,12 @@ class Animal {
 
     this.x += this.vx;
     this.y += this.vy;
-    if (this.x > width - this.r || this.x < this.r) {
+    if (this.x > width - this.r && !this.touch || this.x < this.r && !this.touch) {
       this.vx = -this.vx;
     }
-    if (this.y > height - this.r || this.y < this.r) {
+    if (this.y > height - this.r && !this.touch || this.y < this.r && !this.touch) {
       this.vy = -this.vy;
-    }
-
+  }
     pop();
 
   }

@@ -15,13 +15,14 @@ class SausageDog extends Animal {
 
     if (this.found) {
       this.center;
-      this.image.width += this.growth;
-      this.image.height += this.growth;
-      this.growth += this.growthAcceleration
       this.angle += this.rotationSpeed;
       this.rotationSpeed += this.rotationAcceleration;
+      setTimeout(1000);
+        this.image.width += this.growth;
+        this.image.height += this.growth;
+        this.growth += this.growthAcceleration;
+      }
     }
-  }
 
   mousePressed() {
     if (this.overlap(mouseX, mouseY)) {

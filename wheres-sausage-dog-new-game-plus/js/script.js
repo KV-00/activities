@@ -1,6 +1,6 @@
 "use strict";
 
-const NUM_ANIMAL_IMAGES = 1;
+const NUM_ANIMAL_IMAGES = 5;
 const NUM_ANIMALS = 100;
 
 let animalImages = [];
@@ -42,6 +42,7 @@ function draw() {
   }
 
   sausageDog.update();
+
 }
 
 function mousePressed() {
