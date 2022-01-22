@@ -12,14 +12,17 @@ class Animal {
 
     this.angle = 0;
 
-    this.jitter = 0.0;
+    this.jitter = 0;
+
+
   }
 
   update() {
     this.display();
 
     this.angle = atan(this.vy / this.vx);
-    this.angle = this.angle + this.jitter;
+
+    this.angle = this.angle + this.jitter * (this.vx * this.vy);
 
     if (second() % 1 === 0) {
         this.jitter = random(-0.05, 0.05);
@@ -30,7 +33,6 @@ class Animal {
       this.vx += this.acceleration;
       this.y += this.vy*5;
       this.vy += this.acceleration;
-      this.jitter = random(-0.1, 0.1);
     }
   }
 
