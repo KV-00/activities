@@ -1,7 +1,7 @@
 "use strict";
 
 const NUM_ANIMAL_IMAGES = 5;
-const NUM_ANIMALS = 10;
+const NUM_ANIMALS = 50;
 
 let animalImages = [];
 let animals = [];
@@ -9,9 +9,16 @@ let animals = [];
 let sausageDogImage = undefined;
 let sausageDog = undefined;
 
-let dim;
+let gradient;
+let r;
+let g;
+let b;
+let a;
+let ir;
 
 function preload() {
+gradient = loadImage(`assets/images/gradient.png`);
+
   for (let i = 0; i < NUM_ANIMAL_IMAGES; i++) {
     let animalImage =  loadImage(`assets/images/animal${i}.png`);
     animalImages.push(animalImage);
@@ -23,15 +30,10 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  dim = width*2;
-  background(0);
-  colorMode(HSB, 360, 100, 100);
-  noStroke();
-  ellipseMode(RADIUS);
-  background(0);
-  for (let x = width/2; x <= width; x += dim) {
-    drawGradient(x, height / 2);
-  }
+  r = random(10, 200);
+  g = random(10, 200);
+  b = random(10, 200);
+  a = random(50, 100);
 
   for (let i = 0; i < NUM_ANIMALS; i++) {
     let x = random(50, width - 50);
@@ -47,6 +49,8 @@ function setup() {
 }
 
 function draw() {
+  drawGradient();
+
   for (let i = 0; i < animals.length; i++) {
     animals[i].update();
   }
@@ -54,14 +58,16 @@ function draw() {
   sausageDog.update();
 }
 
+
 function drawGradient(x, y) {
-  let radius = dim / 2;
-  let h = random(0, 360);
-  for (let r = radius; r > 0; --r) {
-    fill(h, 90, 90);
-    ellipse(x, y, r, r);
-    h = (h + 1) % 360;
-  }
+  image(gradient, 0, 0, width, height);
+  push();
+  let bgcolor = color (r, g, b);
+  bgcolor.setAlpha(1000);
+  fill(bgcolor);
+  blendMode(SCREEN);
+  rect(0, 0, width, height);
+  pop();
 }
 
 function mousePressed() {
