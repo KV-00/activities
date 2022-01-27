@@ -20,7 +20,14 @@ class Animal {
   update() {
     this.display();
 
-    this.angle = atan(this.vy / this.vx);
+    if (this.vx > 0){
+      this.angle = atan(this.vy / this.vx);
+    }
+    if (this.vx < 0){
+      this.angle = atan(this.vy / this.vx) ;
+    }
+
+
 
 
     this.angle = this.angle + this.jitter * (this.vx * this.vy);
