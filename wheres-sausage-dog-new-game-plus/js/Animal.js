@@ -21,10 +21,10 @@ class Animal {
     this.display();
 
     if (this.vx > 0){
-      this.angle = atan(this.vy / this.vx);
+      this.angle = atan2(this.vy, this.vx);
     }
     if (this.vx < 0){
-      this.angle = atan(this.vy / this.vx) ;
+      this.angle = atan2(this.vy, this.vx);
     }
 
 
