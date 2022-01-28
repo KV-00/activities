@@ -7,7 +7,7 @@ class Animal {
     this.vx = random(1,-1);
     this.vy = random(1,-1);
     this.acceleration = 0.01;
-
+    this.scale = 1;
     this.r = 25;
 
     this.angle = 0;
@@ -50,6 +50,7 @@ class Animal {
     translate(this.x, this.y);
 
     rotate(this.angle);
+    scale(this.scale);
     image(this.image, 0, 0);
 
     this.x += this.vx;
