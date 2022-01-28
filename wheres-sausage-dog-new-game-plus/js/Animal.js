@@ -4,8 +4,8 @@ class Animal {
     this.y = y;
     this.image = image;
     this.touch = false;
-    this.vx = random(1,-1);
-    this.vy = random(1,-1);
+    this.vx = random(1, -1);
+    this.vy = random(1, -1);
     this.acceleration = 0.01;
     this.scale = 1;
     this.r = 25;
@@ -20,10 +20,10 @@ class Animal {
   update() {
     this.display();
 
-    if (this.vx > 0){
+    if (this.vx > 0) {
       this.angle = atan2(this.vy, this.vx);
     }
-    if (this.vx < 0){
+    if (this.vx < 0) {
       this.angle = atan2(this.vy, this.vx);
     }
 
@@ -33,13 +33,13 @@ class Animal {
     this.angle = this.angle + this.jitter * (this.vx * this.vy);
 
     if (second() % 1 === 0) {
-        this.jitter = random(-0.05, 0.05);
-      }
+      this.jitter = random(-0.05, 0.05);
+    }
 
     if (this.touch) {
-      this.x += this.vx*5;
+      this.x += this.vx * 5;
       this.vx += this.acceleration;
-      this.y += this.vy*5;
+      this.y += this.vy * 5;
       this.vy += this.acceleration;
     }
   }
@@ -60,7 +60,7 @@ class Animal {
     }
     if (this.y > height - this.r && !this.touch || this.y < this.r && !this.touch) {
       this.vy = -this.vy;
-  }
+    }
     pop();
 
   }
@@ -71,9 +71,8 @@ class Animal {
       y > this.y - this.image.height / 2 &&
       y < this.y + this.image.height / 2) {
       return true;
-      }
-      else {
-        return false;
+    } else {
+      return false;
     }
   }
 
