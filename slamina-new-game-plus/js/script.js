@@ -139,10 +139,15 @@ const animals =  [
       "zebra"
     ];
 
+let bg;
+
 let currentAnimal = ``;
 let currentAnswer = ``;
 
+let angle = 0;
+
 function preload() {
+  bg = loadImage(`assets/images/bg.png`);
 }
 
 function setup() {
@@ -153,16 +158,34 @@ function setup() {
 function draw() {
   console.log(gameState);
   background(0);
+  image(bg, 0, 0, width, height);
+
+  angle += 0.002;
 
   if (gameState == "start") {
-    text("SLAMINA", width / 2, height / 2);
-    textSize(64);
     textStyle(BOLD);
-    textAlign(CENTER, CENTER);
+    textSize(128);
     fill (255, 255, 255);
+    text("SLAMINA!", width / 2, height / 2);
+
+    textSize(32);
+    fill (200, 200, 200);
+    textAlign(CENTER);
+    rotate(angle);
+    text("SAY *START* TO PLAY!", width / 2, height / 1.5);
+
+
   }
 
   if (gameState == "play") {
+    push();
+    let bgcolor = color(150, 50, 50);
+    bgcolor.setAlpha(1000);
+    fill(bgcolor);
+    blendMode(MULTIPLY);
+    rect(0, 0, width, height);
+    pop();
+
     if (currentAnswer === currentAnimal) {
       fill (0, 255, 0);
     }
@@ -186,8 +209,6 @@ function sceneManager() {
 
 function startScreen() {
   responsiveVoice.speak("Welcome to Slamina. Say start to begin the game");
-
-
 
   if (annyang) {
     if (gameState === "start"){
