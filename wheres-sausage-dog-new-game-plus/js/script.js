@@ -1,8 +1,5 @@
 "use strict";
 
-const NUM_ANIMAL_IMAGES = 5;
-const NUM_ANIMALS = 50;
-
 let animalImages = [];
 let animals = [];
 
@@ -16,13 +13,12 @@ let b;
 let a;
 let ir;
 
-<<<<<<< Updated upstream
 let gameState = "start";
-=======
-//
-let scene = "start";
-//
->>>>>>> Stashed changes
+
+let level = 1;
+
+let NUM_ANIMAL_IMAGES = 5;
+let NUM_ANIMALS = 10;
 
 function preload() {
   gradient = loadImage(`assets/images/gradient.png`);
@@ -43,24 +39,15 @@ function setup() {
   b = random(10, 200);
   a = random(50, 100);
 
-  setupAnimals();
-<<<<<<< Updated upstream
   setupSausage();
 
-}
-
-function startScreen() {
-  rect(width / 2, height / 2, 100, 100);
 }
 
 function playScreen() {
   for (let i = 0; i < animals.length; i++) {
     animals[i].update();
   }
-
   sausageDog.update();
-=======
-  setupSausageDog();
 }
 
 function startScreen() {
@@ -69,17 +56,18 @@ function startScreen() {
 
   sausageDog.found = false;
   sausageDog.time = 0;
+  preload();
 
->>>>>>> Stashed changes
 }
 
 function sceneManager() {
+  console.log(level);
+  console.log(NUM_ANIMAL_IMAGES);
 
-<<<<<<< Updated upstream
-  if (gameState = "start") {
+  if (gameState == "start") {
       startScreen();
   }
-  if (gameState = "play") {
+  if (gameState == "play") {
       playScreen();
   }
 }
@@ -91,16 +79,13 @@ function setupSausage(){
 }
 
 function setupAnimals(){
-=======
-  if (scene === "start") {
-
-    startScreen();
-
-  } else if (scene === "play") {
-
-    playScreen();
+  for (let i = 0; i < NUM_ANIMALS; i++) {
+    let x = random(50, width - 50);
+    let y = random(50, height - 50);
+    let animalImage = random(animalImages);
+    let animal = new Animal(x, y, animalImage);
+    animals.push(animal);
   }
-
 }
 
 function playScreen() {
@@ -114,40 +99,10 @@ function playScreen() {
   sausageDog.update();
 }
 
-function setupAnimals() {
-
->>>>>>> Stashed changes
-  for (let i = 0; i < NUM_ANIMALS; i++) {
-    let x = random(50, width - 50);
-    let y = random(50, height - 50);
-    let animalImage = random(animalImages);
-    let animal = new Animal(x, y, animalImage);
-    animals.push(animal);
-  }
-<<<<<<< Updated upstream
-}
-
-function draw() {
-  drawGradient();
-  sceneManager();
-=======
-}
-
-function setupSausageDog() {
-
-  let x = random(50, width - 50);
-  let y = random(50, height - 50);
-  sausageDog = new SausageDog(x, y, sausageDogImage);
-}
-
 function draw() {
   background(0);
-
   sceneManager();
 
-  console.log(sausageDog.time);
-  console.log(sausageDog.found);
->>>>>>> Stashed changes
 }
 
 
@@ -163,31 +118,32 @@ function drawGradient(x, y) {
 }
 
 function mousePressed() {
-<<<<<<< Updated upstream
-  if (gameState = "start") {
-      gameState = "play";
+  if (gameState === "start") {
+    setupSausage();
+    gameState = "play";
+
+    if (NUM_ANIMAL_IMAGES != 10) {
+      NUM_ANIMAL_IMAGES += level;
+    }
+    else {
+      NUM_ANIMAL_IMAGES = 10;
+    }
+
+    if (NUM_ANIMALS != 100) {
+      NUM_ANIMALS += level;
+      setupAnimals();
+    }
+    else {
+      NUM_ANIMALS = 100;
+    }
+
   }
-  if (gameState = "play") {
+  else if (gameState === "play") {
 
-  sausageDog.mousePressed();
-
-  for (let i = 0; i < animals.length; i++) {
-    animals[i].mousePressed();
-=======
-
-  if (scene === "start") {
-
-    setupSausageDog();
-    scene = "play";
-  } else if (scene === "play") {
-
+    clear();
     sausageDog.mousePressed();
-
     for (let i = 0; i < animals.length; i++) {
       animals[i].mousePressed();
->>>>>>> Stashed changes
     }
   }
-
-
 }

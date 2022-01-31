@@ -1,5 +1,7 @@
 "use strict";
 
+let gameState = "start";
+
 const animals =  [
       "aardvark",
       "alligator",
@@ -141,52 +143,98 @@ let currentAnimal = ``;
 let currentAnswer = ``;
 
 function preload() {
-
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  sceneManager();
+}
 
+function draw() {
+  console.log(gameState);
+  background(0);
+
+  if (gameState == "start") {
+    text("SLAMINA", width / 2, height / 2);
+    textSize(64);
+    textStyle(BOLD);
+    textAlign(CENTER, CENTER);
+    fill (255, 255, 255);
+  }
+
+  if (gameState == "play") {
+    if (currentAnswer === currentAnimal) {
+      fill (0, 255, 0);
+    }
+    else {
+      fill (255, 0, 0);
+    }
+    text(currentAnswer, width / 2, height / 2);
+  }
+
+
+}
+
+function sceneManager() {
+  if (gameState == "start") {
+      startScreen();
+  }
+  if (gameState == "play") {
+      playScreen();
+  }
+}
+
+function startScreen() {
+  responsiveVoice.speak("Welcome to Slamina. Say start to begin the game");
+
+
+
+  if (annyang) {
+    if (gameState === "start"){
+      let commands = {
+        'start' : gameStart
+      };
+      annyang.addCommands(commands);
+      annyang.start();
+    }
+  }
+}
+
+function playScreen() {
   if (annyang) {
     let commands = {
       'I think it is *animal' : guessAnimal
     };
     annyang.addCommands(commands);
     annyang.start();
-
     textSize(32);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
   }
 }
 
-function draw() {
-  background(0);
-
-  if (currentAnswer === currentAnimal) {
-    fill (0, 255, 0);
-  }
-  else {
-    fill (255, 0, 0);
-  }
-  text(currentAnswer, width / 2, height / 2);
-
+function gameStart() {
+  gameState = "play";
+  playScreen();
 }
 
 function mousePressed() {
-  currentAnimal = random(animals);
-  let reverseAnimal = reverseString(currentAnimal);
-  responsiveVoice.speak(reverseAnimal);
+  if (gameState === "play") {
+    currentAnimal = random(animals);
+    let reverseAnimal = reverseString(currentAnimal);
+    responsiveVoice.speak(reverseAnimal);
+  }
+  else {
+    return;
+  }
 }
 
 function guessAnimal(animal) {
-  currentAnswer = animal.toLowerCase();
-  console.log(currentAnswer);
+    currentAnswer = animal.toLowerCase();
+    console.log(currentAnswer);
 }
 
-/**
-Reverses the provided string
-*/
+//Reverses the provided string
 function reverseString(string) {
   // Split the string into an array of characters
   let characters = string.split('');
