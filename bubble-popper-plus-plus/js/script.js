@@ -1,5 +1,13 @@
 "use strict";
 
+// Have sheep stop adding to boop count once they run away
+
+// Have the player start the game by touching the start message
+
+// Have more sheeps spawn in once all sheep are off the field
+
+// Have sheep's angles work correctly
+
 // The user's webcam
 let video = undefined;
 // The Handpose model
@@ -8,20 +16,31 @@ let handpose = undefined;
 let predictions = [];
 // The bubble
 let bubble = undefined;
-let bubblesPopped = 0;
-
+let sheepsBooped = 0;
+// Sprites
 let sheep;
+let bg;
+// sounds
+let bleet;
+let bgmusic;
 
-function preload() {}
+let gameState = "start";
+
+function preload() {
+  sheep = loadImage(`assets/images/sheep0.png`);
+  bg = loadImage(`assets/images/bg.png`);
+  bleet = loadSound(`assets/sounds/bleet.mp3`);
+  bgmusic = loadSound(`assets/sounds/bgmusic.mp3`);
+}
 
 function setup() {
   createCanvas(640, 480);
 
-  sheep = loadImage(`assets/images/sheep0.png`);
+  bgmusic.play();
 
   // Access user's webcam
-  //video = createCapture(VIDEO);
-  //video.hide();
+  video = createCapture(VIDEO);
+  video.hide();
 
   // Load the handpose model
   handpose = ml5.handpose(
@@ -50,21 +69,13 @@ function setup() {
     vy: random(1, -1),
     r: 25,
     angle: 0,
-    vxRunning: random(40, 50),
-    vyRunning: random(40, 50),
+    vxRunning: random(10, -10),
+    vyRunning: random(10, -10),
   };
 }
 
 function draw() {
-  background(0, 255, 0);
-
-  // Bubbles popped text
-  push();
-  textStyle(BOLD);
-  textSize(16);
-  fill(255, 255, 255);
-  text(`BUBBLES POPPED: ${bubblesPopped}`, width / 50, height / 1.05);
-  pop();
+  image(bg, 0, 0, width, height);
 
   if (predictions.length > 0) {
     let hand = predictions[0];
@@ -75,6 +86,7 @@ function draw() {
     let tipY = tip[1];
     let baseX = base[0];
     let baseY = base[1];
+
     // Pin body
     push();
     noFill();
@@ -82,12 +94,14 @@ function draw() {
     strokeWeight(2);
     line(baseX, baseY, tipX, tipY);
     pop();
+
     //Pin head
     push();
     noStroke();
-    fill(255, 0, 0);
-    ellipse(baseX, baseY, 20);
+    fill(255, 255, 255);
+    ellipse(tipX, tipY, 20);
     pop();
+
     // Check bubble popping
     let d = dist(tipX, tipY, bubble.x, bubble.y);
     if (d < bubble.size / 2) {
@@ -95,42 +109,90 @@ function draw() {
       bubble.touch = true;
       bubble.x += random(1);
       bubble.y += random(1);
-      bubblesPopped += 1;
+      sheepsBooped += 1;
+      bleet.play();
     }
   }
 
-  if (bubble.vx > 0) {
-    bubble.angle = atan2(bubble.vy, bubble.vx);
-  }
-  if (bubble.vx < 0) {
-    bubble.angle = atan2(bubble.vy, bubble.vx);
-  }
-
-  if (bubble.scared === true) {
-    bubble.vx = bubble.vxRunning;
-    bubble.vy = bubble.vyRunning;
-  }
-
-  // Move the bubble
-  bubble.x += bubble.vx;
-  bubble.y += bubble.vy;
-
-  //Bouncing
-  if (bubble.x > width - bubble.r || bubble.x < bubble.r) {
-    bubble.vx = -bubble.vx;
-  }
-  if (bubble.y > height - bubble.r || bubble.y < bubble.r) {
-    bubble.vy = -bubble.vy;
-  }
-
-  if (bubble.y < 0) {
-    bubble.x = random(width);
-    bubble.y = height;
-  }
-
+  // Sheep sprite
   push();
   imageMode(CENTER);
   image(sheep, bubble.x, bubble.y);
-  rotate(sheep.angle);
+  rotate(bubble.angle);
   pop();
+
+  // Start text
+  if (gameState == "start") {
+    textStyle(BOLD);
+    textSize(48);
+    fill(255, 255, 255);
+    text("SHEEP BOOPER PRO", width / 10, height / 2);
+
+    textStyle(BOLD);
+    textSize(24);
+    fill(255, 255, 255);
+    text("*BOOP* HERE TO BEGIN!", width / 4, height / 1.5);
+  }
+
+  if (gameState == "play") {
+    // Bubbles popped text
+    push();
+    textStyle(BOLD);
+    textSize(16);
+    fill(255, 255, 255);
+    text(`SHEEPS BOOPED: ${sheepsBooped}`, width / 50, height / 1.05);
+    pop();
+
+    // Sheep scaring
+    if (bubble.scared === true) {
+      bubble.vx = bubble.vxRunning;
+      bubble.vy = bubble.vyRunning;
+    }
+
+    // Move the bubble
+    bubble.x += bubble.vx;
+    bubble.y += bubble.vy;
+
+    //Bouncing
+    if (
+      (bubble.x > width - bubble.r && !bubble.touch) ||
+      (bubble.x < bubble.r && !bubble.touchh)
+    ) {
+      bubble.vx = -bubble.vx;
+    }
+    if (
+      (bubble.y > height - bubble.r && !bubble.touch) ||
+      (bubble.y < bubble.r && !bubble.touch)
+    ) {
+      bubble.vy = -bubble.vy;
+    }
+
+    // Facing direction of movement
+    if (bubble.vx > 0) {
+      bubble.angle = atan2(bubble.vy, bubble.vx);
+    }
+    if (bubble.vx < 0) {
+      bubble.angle = atan2(bubble.vy, bubble.vx);
+    }
+  }
+}
+
+function sceneManager() {
+  if (gameState == "start") {
+    startScreen();
+  }
+  if (gameState == "play") {
+    playScreen();
+  }
+}
+
+function playScreen() {}
+
+function startScreen() {
+  rect(width / 2, height / 2, 100, 100);
+  preload();
+}
+
+function mousePressed() {
+  gameState = "play";
 }
