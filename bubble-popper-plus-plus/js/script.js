@@ -10,12 +10,12 @@ let video = undefined;
 let handpose = undefined;
 // The current set of predictions
 let predictions = [];
-// The bubble
-let bubble = undefined;
+// The sheep
+let sheep = undefined;
 let sheepsBooped = 0;
 // Sprites
-let sheep;
 let bg;
+let sheepImage = undefined;
 // Sounds
 let bleet;
 let bgmusic;
@@ -23,10 +23,12 @@ let bgmusic;
 let tipX = 0;
 let tipY = 0;
 
+let NUM_SHEEP = 2;
+
 let gameState = "start";
 
 function preload() {
-  sheep = loadImage(`assets/images/sheep0.png`);
+  sheepImage = loadImage(`assets/images/sheep0.png`);
   bg = loadImage(`assets/images/bg.png`);
   bleet = loadSound(`assets/sounds/bleet.mp3`);
   bgmusic = loadSound(`assets/sounds/bgmusic.mp3`);
@@ -57,20 +59,6 @@ function setup() {
     //console.log(results);
     predictions = results;
   });
-
-  // Our bubble
-  bubble = {
-    scared: false,
-    x: width / 2,
-    y: height / 2,
-    size: 100,
-    vx: random(1, -1),
-    vy: random(1, -1),
-    r: 25,
-    angle: 0,
-    vxRunning: random(10, -10),
-    vyRunning: random(10, -10),
-  };
 }
 
 function draw() {
@@ -111,25 +99,29 @@ function startScreen() {
 function playScreen() {
   handlePin();
 
-  // Check bubble popping
-  let d = dist(tipX, tipY, bubble.x, bubble.y);
-  if (d < bubble.size / 2) {
-    bubble.scared = true;
-    bubble.touch = true;
-    bubble.x += random(1);
-    bubble.y += random(1);
+  // Check sheep popping
+  let d = dist(tipX, tipY, Sheep.x, Sheep.y);
+  if (d < Sheep.size / 2 && !Sheep.scared) {
+    Sheep.scared = true;
+    Sheep.touch = true;
+    Sheep.x += random(1);
+    Sheep.y += random(1);
     sheepsBooped += 1;
     bleet.play();
   }
 
-  // Sheep sprite -> function
-  displaySheep();
-
-  // Bubbles popped text -> function
+  // sheeps popped text -> function
   displayUI();
+  // show sheep
+  setupSheep();
+}
 
-  // Sheep scaring -> moveSheep
-  moveSheep();
+function setupSheep() {
+  for (let i = 0; i < NUM_SHEEP; i++) {
+    let x = random(50, width - 50);
+    let y = random(50, height - 50);
+    sheep = new Sheep(x, y, sheepImage);
+  }
 }
 
 function handlePin() {
@@ -160,15 +152,6 @@ function handlePin() {
   }
 }
 
-function displaySheep() {
-  push();
-  imageMode(CENTER);
-  translate(bubble.x, bubble.y); // NEW!
-  rotate(bubble.angle); // NEW (moved up)
-  image(sheep, 0, 0);
-  pop();
-}
-
 function displayUI() {
   push();
   textStyle(BOLD);
@@ -176,37 +159,4 @@ function displayUI() {
   fill(255, 255, 255);
   text(`SHEEPS BOOPED: ${sheepsBooped}`, width / 50, height / 1.05);
   pop();
-}
-
-function moveSheep() {
-  if (bubble.scared === true) {
-    bubble.vx = bubble.vxRunning;
-    bubble.vy = bubble.vyRunning;
-  }
-
-  // Move the bubble
-  bubble.x += bubble.vx;
-  bubble.y += bubble.vy;
-
-  //Bouncing
-  if (
-    (bubble.x > width - bubble.r && !bubble.touch) ||
-    (bubble.x < bubble.r && !bubble.touch)
-  ) {
-    bubble.vx = -bubble.vx;
-  }
-  if (
-    (bubble.y > height - bubble.r && !bubble.touch) ||
-    (bubble.y < bubble.r && !bubble.touch)
-  ) {
-    bubble.vy = -bubble.vy;
-  }
-
-  // Facing direction of movement
-  if (bubble.vx > 0) {
-    bubble.angle = atan2(bubble.vy, bubble.vx);
-  }
-  if (bubble.vx < 0) {
-    bubble.angle = atan2(bubble.vy, bubble.vx);
-  }
 }
