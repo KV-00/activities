@@ -20,7 +20,7 @@ let sheepsBooped = 0;
 // Sprites
 let sheep;
 let bg;
-// sounds
+// Sounds
 let bleet;
 let bgmusic;
 
@@ -156,7 +156,7 @@ function draw() {
     //Bouncing
     if (
       (bubble.x > width - bubble.r && !bubble.touch) ||
-      (bubble.x < bubble.r && !bubble.touchh)
+      (bubble.x < bubble.r && !bubble.touch)
     ) {
       bubble.vx = -bubble.vx;
     }
