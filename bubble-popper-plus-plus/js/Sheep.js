@@ -1,10 +1,12 @@
 class Sheep {
   constructor(x, y, image) {
-    this.x = width / 2;
-    this.y = height / 2;
+    this.x = x;
+    this.y = y;
+    this.image = image;
     this.size = 100;
     this.vx = random(1, -1);
     this.vy = random(1, -1);
+    this.scale = 1;
     this.r = 25;
     this.angle = 0;
     this.vxRunning = random(10, -10);
@@ -60,6 +62,8 @@ class Sheep {
     imageMode(CENTER);
     translate(this.x, this.y);
     rotate(this.angle);
+    scale(this.scale);
+    image(this.image, 0, 0);
     pop();
   }
 }

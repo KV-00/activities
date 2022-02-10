@@ -1,9 +1,5 @@
 "use strict";
 
-// Have sheep stop adding to boop count once they run away
-
-// Have more sheeps spawn in once all sheep are off the field
-
 // The user's webcam
 let video = undefined;
 // The Handpose model
@@ -11,10 +7,15 @@ let handpose = undefined;
 // The current set of predictions
 let predictions = [];
 // The sheep
+let NUM_SHEEP = 1;
+let NUM_SHEEP_IMAGES = 1;
+let sheeps = [];
 let sheep = undefined;
 let sheepsBooped = 0;
+let scaredSheep = NUM_SHEEP;
 // Sprites
 let bg;
+let sheepImages = [];
 let sheepImage = undefined;
 // Sounds
 let bleet;
@@ -23,12 +24,14 @@ let bgmusic;
 let tipX = 0;
 let tipY = 0;
 
-let NUM_SHEEP = 2;
-
 let gameState = "start";
 
 function preload() {
-  sheepImage = loadImage(`assets/images/sheep0.png`);
+  for (let i = 0; i < NUM_SHEEP_IMAGES; i++) {
+    let sheepImage = loadImage(`assets/images/sheep${i}.png`);
+    sheepImages.push(sheepImage);
+  }
+
   bg = loadImage(`assets/images/bg.png`);
   bleet = loadSound(`assets/sounds/bleet.mp3`);
   bgmusic = loadSound(`assets/sounds/bgmusic.mp3`);
@@ -37,11 +40,13 @@ function preload() {
 function setup() {
   createCanvas(640, 480);
 
+  setupSheep();
+
   bgmusic.play();
 
   // Access user's webcam
-  video = createCapture(VIDEO);
-  video.hide();
+  //video = createCapture(VIDEO);
+  //video.hide();
 
   // Load the handpose model
   handpose = ml5.handpose(
@@ -87,9 +92,6 @@ function startScreen() {
   fill(255, 255, 255);
   text("*BOOP* HERE TO BEGIN!", width / 4, height / 1.5);
 
-  // Really it's better to make the position of this "button" as variables
-  // rather than typing out the position explicitly like this!
-
   let d = dist(tipX, tipY, width / 4, height / 1.5);
   if (d < 100) {
     gameState = `play`;
@@ -99,28 +101,43 @@ function startScreen() {
 function playScreen() {
   handlePin();
 
-  // Check sheep popping
+  for (let i = 0; i < sheeps.length; i++) {
+    sheeps[i].update();
+  }
+
+  // Check sheep booping
   let d = dist(tipX, tipY, Sheep.x, Sheep.y);
-  if (d < Sheep.size / 2 && !Sheep.scared) {
+  if (d < Sheep.size / 2) {
     Sheep.scared = true;
     Sheep.touch = true;
     Sheep.x += random(1);
     Sheep.y += random(1);
     sheepsBooped += 1;
+    scaredSheep -= 1;
     bleet.play();
   }
 
-  // sheeps popped text -> function
+  // Adding in sheep
+  setTimeout(addSheep, 3000);
+  // sheeps booped text -> function
   displayUI();
-  // show sheep
-  setupSheep();
+}
+
+function addSheep() {
+  if (scaredSheep === 0) {
+    NUM_SHEEP += 1;
+    scaredSheep = NUM_SHEEP;
+    setupSheep();
+  }
 }
 
 function setupSheep() {
   for (let i = 0; i < NUM_SHEEP; i++) {
     let x = random(50, width - 50);
     let y = random(50, height - 50);
-    sheep = new Sheep(x, y, sheepImage);
+    let sheepImage = random(sheepImages);
+    let sheep = new Sheep(x, y, sheepImage);
+    sheeps.push(sheep);
   }
 }
 
@@ -159,4 +176,9 @@ function displayUI() {
   fill(255, 255, 255);
   text(`SHEEPS BOOPED: ${sheepsBooped}`, width / 50, height / 1.05);
   pop();
+}
+
+function mousePressed() {
+  gameState = "play";
+  scaredSheep -= 1;
 }
