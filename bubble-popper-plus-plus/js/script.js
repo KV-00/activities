@@ -45,8 +45,8 @@ function setup() {
   bgmusic.play();
 
   // Access user's webcam
-  //video = createCapture(VIDEO);
-  //video.hide();
+  video = createCapture(VIDEO);
+  video.hide();
 
   // Load the handpose model
   handpose = ml5.handpose(
@@ -85,14 +85,14 @@ function startScreen() {
   text("SHEEP BOOPER PRO", width / 10, height / 2);
 
   fill(0);
-  rect(width / 4, height / 1.5, 292, -24);
+  let hitbox = rect(width / 4, height / 1.5, 292, -20);
 
   textStyle(BOLD);
   textSize(24);
   fill(255, 255, 255);
   text("*BOOP* HERE TO BEGIN!", width / 4, height / 1.5);
 
-  let d = dist(tipX, tipY, width / 4, height / 1.5);
+  let d = dist(tipX, tipY, width / 2, height / 1.5);
   if (d < 100) {
     gameState = `play`;
   }
