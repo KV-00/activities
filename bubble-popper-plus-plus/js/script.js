@@ -67,11 +67,15 @@ function setup() {
 }
 
 function draw() {
-  image(bg, 0, 0, width, height);
-
-  if (gameState === `start`) {
+if (gameState === `start`) {
+    image(bg, 0, 0, width, height);
+    push();
+    fill(0, 0, 0, 100);
+    rect(0,0, width, height);
+    pop();
     startScreen();
   } else if (gameState === `play`) {
+    image(bg, 0, 0, width, height);
     playScreen();
   }
 }
@@ -84,18 +88,19 @@ function startScreen() {
   fill(255, 255, 255);
   text("SHEEP BOOPER PRO", width / 10, height / 2);
 
-  fill(0);
-  let hitbox = rect(width / 4, height / 1.5, 292, -20);
-
   textStyle(BOLD);
   textSize(24);
   fill(255, 255, 255);
-  text("*BOOP* HERE TO BEGIN!", width / 4, height / 1.5);
+  text("*BOOP* HERE TO BEGIN!", width / 4, height / 1.5+20);
 
-  let d = dist(tipX, tipY, width / 2, height / 1.5);
-  if (d < 100) {
-    gameState = `play`;
+  if (tipX > width / 4 && tipX < (width / 4 + 292) && tipY > height / 1.5 && tipY < (height / 1.5 + 20)) {
+    gameState = `play`
   }
+
+  // let d = dist(tipX, tipY, width / 2, height / 1.5);
+  // if (d < 100) {
+  //   gameState = `play`;
+  // }
 }
 
 function playScreen() {
@@ -106,15 +111,18 @@ function playScreen() {
   }
 
   // Check sheep booping
-  let d = dist(tipX, tipY, Sheep.x, Sheep.y);
-  if (d < Sheep.size / 2) {
-    Sheep.scared = true;
-    Sheep.touch = true;
-    Sheep.x += random(1);
-    Sheep.y += random(1);
+  for (let i = 0; i < sheeps.length; i++) {
+  let d = dist(tipX, tipY, sheeps[i].x, sheeps[i].y);
+  if (d < sheeps[i].size / 2 && sheeps[i].touch === false) {
+    console.log("BOOP");
+    sheeps[i].scared = true;
+    sheeps[i].touch = true;
+    sheeps[i].x += random(1);
+    sheeps[i].y += random(1);
     sheepsBooped += 1;
     scaredSheep -= 1;
     bleet.play();
+    }
   }
 
   // Adding in sheep
@@ -176,9 +184,4 @@ function displayUI() {
   fill(255, 255, 255);
   text(`SHEEPS BOOPED: ${sheepsBooped}`, width / 50, height / 1.05);
   pop();
-}
-
-function mousePressed() {
-  gameState = "play";
-  scaredSheep -= 1;
 }

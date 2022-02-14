@@ -9,10 +9,11 @@ class Sheep {
     this.scale = 1;
     this.r = 25;
     this.angle = 0;
-    this.vxRunning = random(10, -10);
-    this.vyRunning = random(10, -10);
+    this.vxRunning = random(20, -20);
+    this.vyRunning = random(20, -20);
     this.jitter = 0;
     this.scared = false;
+    this.touch = false;
   }
 
   update() {
