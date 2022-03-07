@@ -6,20 +6,24 @@ let video = undefined;
 let handpose = undefined;
 // The current set of predictions
 let predictions = [];
-// The sheep
-let NUM_SHEEP = 1;
-let NUM_SHEEP_IMAGES = 1;
-let sheeps = [];
-let sheep = undefined;
-let sheepsBooped = 0;
-let scaredSheep = NUM_SHEEP;
+// The knight
+let NUM_KNIGHT = 1;
+let knights = [];
+let knight = undefined;
+let knightsSlashed = 0;
+let slashedKnights = NUM_KNIGHT;
 // Sprites
 let bg;
-let sheepImages = [];
-let sheepImage = undefined;
+let knightImage = undefined;
+let title;
+let sword;
+let wrong;
 // Sounds
-let bleet;
+let NUM_SCREAMS = 5;
+let screams = [];
 let bgmusic;
+// Font
+let font;
 
 let tipX = 0;
 let tipY = 0;
@@ -27,26 +31,31 @@ let tipY = 0;
 let gameState = "start";
 
 function preload() {
-  for (let i = 0; i < NUM_SHEEP_IMAGES; i++) {
-    let sheepImage = loadImage(`assets/images/sheep${i}.png`);
-    sheepImages.push(sheepImage);
+  knightImage = loadImage(`assets/images/knight.png`);
+  bg = loadImage(`assets/images/bg.png`);
+  title = loadImage(`assets/images/title.png`);
+  sword = loadImage(`assets/images/sword.png`);
+  wrong = loadImage(`assets/images/X.png`);
+
+  for (let i = 0; i < NUM_SCREAMS; i++) {
+    let scream = loadSound(`assets/sounds/scream${i}.mp3`);
+    screams.push(scream);
   }
 
-  bg = loadImage(`assets/images/bg.png`);
-  bleet = loadSound(`assets/sounds/bleet.mp3`);
   bgmusic = loadSound(`assets/sounds/bgmusic.mp3`);
+  font = loadFont("assets/fonts/Mindfulness.otf");
 }
 
 function setup() {
   createCanvas(640, 480);
 
-  setupSheep();
+  setupKnight();
 
   bgmusic.play();
 
   // Access user's webcam
-  //video = createCapture(VIDEO);
-  //video.hide();
+  video = createCapture(VIDEO);
+  video.hide();
 
   // Load the handpose model
   handpose = ml5.handpose(
@@ -67,93 +76,88 @@ function setup() {
 }
 
 function draw() {
+  image(bg, 0, 0, width, height);
   if (gameState === `start`) {
-    image(bg, 0, 0, width, height);
-    push();
-    fill(0, 0, 0, 100);
-    rect(0, 0, width, height);
-    pop();
     startScreen();
   } else if (gameState === `play`) {
-    image(bg, 0, 0, width, height);
     playScreen();
   }
 }
 
 function startScreen() {
-  handlePin();
+  image(title, width / 7, height / 8);
 
-  textStyle(BOLD);
-  textSize(14);
-  fill(255, 255, 255);
-  text(
-    "Hi! If you're seeing this message, you should know this build is still a WIP! Thanks!",
-    width / 10,
-    height / 2
-  );
+  handleSword();
 
-  textStyle(BOLD);
-  textSize(24);
-  fill(255, 255, 255);
-  text("*BOOP*", width / 4, height / 1.5 + 20);
+  startButton();
+}
+
+function startButton() {
+  textSize(48);
+  fill(0, 0, 0);
+  textFont(font);
+  text("*SLASH* HERE TO BEGIN!", width / 4, height / 1.2);
 
   if (
     tipX > width / 4 &&
     tipX < width / 4 + 292 &&
-    tipY > height / 1.5 &&
-    tipY < height / 1.5 + 20
+    tipY > height / 1.2 &&
+    tipY < height / 1.2 + 20
   ) {
     gameState = `play`;
   }
 }
 
 function playScreen() {
-  handlePin();
+  handleSword();
 
-  for (let i = 0; i < sheeps.length; i++) {
-    sheeps[i].update();
+  for (let i = 0; i < knights.length; i++) {
+    knights[i].update();
   }
 
-  // Check sheep booping
-  for (let i = 0; i < sheeps.length; i++) {
-    let d = dist(tipX, tipY, sheeps[i].x, sheeps[i].y);
-    if (d < sheeps[i].size / 2 && sheeps[i].touch === false) {
-      console.log("BOOP");
-      sheeps[i].scared = true;
-      sheeps[i].touch = true;
-      sheeps[i].x += random(1);
-      sheeps[i].y += random(1);
-      sheepsBooped += 1;
-      scaredSheep -= 1;
-      bleet.play();
-    }
-  }
-
-  // Adding in sheep
-  setTimeout(addSheep, 3000);
-  // sheeps booped text -> function
+  // Check slashing
+  slash();
+  // Adding in knight
+  setTimeout(addKnight, 3000);
+  // knights booped text -> function
   displayUI();
 }
 
-function addSheep() {
-  if (scaredSheep === 0) {
-    NUM_SHEEP += 1;
-    scaredSheep = NUM_SHEEP;
-    setupSheep();
+function slash() {
+  for (let i = 0; i < knights.length; i++) {
+    let d = dist(tipX, tipY, knights[i].x, knights[i].y);
+    if (d < knights[i].size / 2 && knights[i].touch === false) {
+      console.log("BOOP");
+      knights[i].scared = true;
+      knights[i].touch = true;
+      knights[i].x += random(1);
+      knights[i].y += random(1);
+      knightsSlashed += 1;
+      slashedKnights -= 1;
+      let scream = random(screams);
+      scream.play();
+    }
   }
 }
 
-function setupSheep() {
-  for (let i = 0; i < NUM_SHEEP; i++) {
-    let x = random(50, width - 50);
-    let y = random(50, height - 50);
-    let sheepImage = random(sheepImages);
-    let sheep = new Sheep(x, y, sheepImage);
-    sheeps.push(sheep);
+function addKnight() {
+  if (slashedKnights === 0) {
+    NUM_KNIGHT += 1;
+    slashedKnights = NUM_KNIGHT;
+    setupKnight();
   }
 }
 
-function handlePin() {
+function setupKnight() {
+  for (let i = 0; i < NUM_KNIGHT; i++) {
+    let x = random(width);
+    let y = height;
+    let knight = new Knight(x, y, knightImage);
+    knights.push(knight);
+  }
+}
+
+function handleSword() {
   if (predictions.length > 0) {
     let hand = predictions[0];
     let index = hand.annotations.indexFinger;
@@ -166,20 +170,58 @@ function handlePin() {
 
     // Sword
     push();
+    noFill();
+    stroke(255, 255, 255);
+    strokeWeight(2);
+    line(baseX, baseY, tipX, tipY);
+    pop();
 
+    //Pin head
+    push();
+    noStroke();
+    fill(255, 255, 255);
+    image(sword, tipX, tipY);
     pop();
   }
 }
 
+function romanize(num) {
+  var lookup = {
+      M: 1000,
+      CM: 900,
+      D: 500,
+      CD: 400,
+      C: 100,
+      XC: 90,
+      L: 50,
+      XL: 40,
+      X: 10,
+      IX: 9,
+      V: 5,
+      IV: 4,
+      I: 1,
+    },
+    roman = "",
+    i;
+  for (i in lookup) {
+    while (num >= lookup[i]) {
+      roman += i;
+      num -= lookup[i];
+    }
+  }
+  return roman;
+}
+
 function displayUI() {
   push();
-  textStyle(BOLD);
-  textSize(16);
+  textSize(32);
   fill(255, 255, 255);
-  text(`SHEEPS BOOPED: ${sheepsBooped}`, width / 50, height / 1.05);
+  textFont(font);
+  text(`SCORE: ${romanize(knightsSlashed)}`, width / 1.2, height / 20);
   pop();
 }
 
 function mousePressed() {
+  slash();
   gameState = `play`;
 }
