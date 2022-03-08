@@ -25,6 +25,14 @@ let bgmusic;
 // Font
 let font;
 
+let lives = 3;
+
+let restart = false;
+
+let startTime = 0;
+let timePassed = 0;
+let timerRunning = false;
+
 let tipX = 0;
 let tipY = 0;
 
@@ -81,6 +89,8 @@ function draw() {
     startScreen();
   } else if (gameState === `play`) {
     playScreen();
+  } else if (gameState === "gameOver") {
+    gameOver();
   }
 }
 
@@ -100,16 +110,40 @@ function startButton() {
 
   if (
     tipX > width / 4 &&
-    tipX < width / 4 + 292 &&
+    tipX < width / 4 + 287 &&
     tipY > height / 1.2 &&
-    tipY < height / 1.2 + 20
+    tipY < height / 1.2 + 45
   ) {
     gameState = `play`;
   }
 }
 
+function gameOver() {
+  textSize(128);
+  fill(0, 0, 0);
+  textFont(font);
+  text("GAME OVER", width / 5, height / 2);
+  if (restart === false) {
+    setTimeout(function () {
+      gameState = "start";
+      lives = 3;
+      knightsSlashed = 0;
+      NUM_KNIGHT = 1;
+      slashedKnights = NUM_KNIGHT;
+      startTime = 0;
+      timePassed = 0;
+      setupKnight();
+      restart = false;
+    }, 3000);
+
+    restart = true;
+  }
+}
+
 function playScreen() {
   handleSword();
+
+  displayLives();
 
   for (let i = 0; i < knights.length; i++) {
     knights[i].update();
@@ -118,20 +152,83 @@ function playScreen() {
   // Check slashing
   slash();
   // Adding in knight
-  setTimeout(addKnight, 3000);
+  knightDelay();
   // knights booped text -> function
   displayUI();
+  // Lives
+  manageLives();
+
+  if (lives <= 0) {
+    gameState = "gameOver";
+  }
+}
+
+function displayLives() {
+  if (lives < 1) {
+    push();
+    tint(255, 0, 0);
+    image(wrong, width / 50, height / 50);
+    image(wrong, width / 8, height / 50);
+    image(wrong, width / 4.3, height / 50);
+    pop();
+  } else if (lives < 2) {
+    push();
+    tint(255, 0, 0);
+    image(wrong, width / 50, height / 50);
+    image(wrong, width / 8, height / 50);
+    pop();
+    image(wrong, width / 4.3, height / 50);
+  } else if (lives < 3) {
+    push();
+    tint(255, 0, 0);
+    image(wrong, width / 50, height / 50);
+    pop();
+    image(wrong, width / 8, height / 50);
+    image(wrong, width / 4.3, height / 50);
+  } else {
+    image(wrong, width / 50, height / 50);
+    image(wrong, width / 8, height / 50);
+    image(wrong, width / 4.3, height / 50);
+  }
+}
+
+function manageLives() {
+  for (let i = 0; i < knights.length; i++) {
+    if (knights[i].y > height) {
+      knights.splice(i, 1);
+      lives -= 1;
+      slashedKnights -= 1;
+      console.log(lives);
+    }
+  }
+}
+
+function knightDelay() {
+  if (slashedKnights === 0 && timerRunning === false) {
+    startTime = millis();
+    timerRunning = true;
+  }
+  if (timerRunning === true) {
+    timePassed = millis() - startTime;
+    console.log(timePassed);
+    if (timePassed >= 2000) {
+      addKnight();
+      timerRunning = false;
+      timePassed = 0;
+    }
+  }
 }
 
 function slash() {
   for (let i = 0; i < knights.length; i++) {
     let d = dist(tipX, tipY, knights[i].x, knights[i].y);
     if (d < knights[i].size / 2 && knights[i].touch === false) {
-      console.log("BOOP");
+      console.log("SLASH");
       knights[i].scared = true;
       knights[i].touch = true;
-      knights[i].x += random(1);
-      knights[i].y += random(1);
+      //knights[i].x += random(1);
+      //knights[i].y += random(1);
+      knights.splice(i, 1);
       knightsSlashed += 1;
       slashedKnights -= 1;
       let scream = random(screams);
@@ -141,20 +238,19 @@ function slash() {
 }
 
 function addKnight() {
-  if (slashedKnights === 0) {
-    NUM_KNIGHT += 1;
-    slashedKnights = NUM_KNIGHT;
-    setupKnight();
+  console.log("add");
+  NUM_KNIGHT += 1;
+  slashedKnights = NUM_KNIGHT;
+  for (let i = 0; i < NUM_KNIGHT; i++) {
+    setTimeout(setupKnight, 2000 * i);
   }
 }
 
 function setupKnight() {
-  for (let i = 0; i < NUM_KNIGHT; i++) {
-    let x = random(width);
-    let y = height;
-    let knight = new Knight(x, y, knightImage);
-    knights.push(knight);
-  }
+  let x = random(width);
+  let y = height;
+  let knight = new Knight(x, y, knightImage);
+  knights.push(knight);
 }
 
 function handleSword() {
@@ -168,18 +264,9 @@ function handleSword() {
     let baseX = base[0];
     let baseY = base[1];
 
-    // Sword
-    push();
-    noFill();
-    stroke(255, 255, 255);
-    strokeWeight(2);
-    line(baseX, baseY, tipX, tipY);
-    pop();
-
-    //Pin head
+    //Sword
     push();
     noStroke();
-    fill(255, 255, 255);
     image(sword, tipX, tipY);
     pop();
   }
@@ -214,14 +301,9 @@ function romanize(num) {
 
 function displayUI() {
   push();
-  textSize(32);
+  textSize(48);
   fill(255, 255, 255);
   textFont(font);
-  text(`SCORE: ${romanize(knightsSlashed)}`, width / 1.2, height / 20);
+  text(`SCORE: ${romanize(knightsSlashed)}`, width / 1.3, height / 10);
   pop();
-}
-
-function mousePressed() {
-  slash();
-  gameState = `play`;
 }
