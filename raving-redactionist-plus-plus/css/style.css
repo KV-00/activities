@@ -1,16 +1,28 @@
 #secret-document {
-  font-family: monospace;
-  font-size: 1.25rem;
+  font-family: cursive;
+  font-size: 1rem;
   width: 50vw;
+  text-align: center;
   margin: auto;
+  color: #5f5661;
 }
 
-.redacted {
-  background-color: black;
+body {
+  background-color: #e1cba6;
+}
+
+.empty {
   user-select: none;
+  color: #876969;
 }
 
-.revealed {
-  color: red;
+.appear {
+  color: #876969;
+  text-decoration: underline;
+}
+
+.overStay {
+  user-select: none;
+  color: #c24362;
   text-decoration: underline;
 }
